@@ -134,7 +134,7 @@ Dari sekian banyak kandidat yang ditemukan, hanya **M teratas** (setelah reranki
 **Pertanyaan Refleksi:**
 
 * Benarkah "semakin banyak konteks semakin bagus"? Jelaskan berdasarkan eksperimenmu.
-  > Jawab: ... 4,7,6
+  > Jawab: Tidak selalu. Dari hasil eksperimen 4, 7, dan 6, saya melihat bahwa konteks yang terlalu banyak belum tentu memberi jawaban terbaik karena model bisa menerima informasi yang berlebihan atau kurang fokus, sehingga pilihan menengah lebih efektif.
 
 * Apa yang terjadi kalau konteks yang dikirim ke LLM saling bertentangan?
   > Jawab: Jika chunk yang dikirim saling bertentangan, LLM bisa menghasilkan jawaban yang ragu-ragu, mencampur dua informasi, atau memilih salah satu tanpa dasar yang jelas. Karena itu, pemilihan konteks akhir harus tetap ketat agar hanya chunk yang paling relevan dan konsisten yang masuk ke prompt.
