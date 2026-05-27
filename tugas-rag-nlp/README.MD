@@ -119,15 +119,15 @@ Dari sekian banyak kandidat yang ditemukan, hanya **M teratas** (setelah reranki
 
 **Fungsi:** *(Jelaskan dengan kata-katamu sendiri apa fungsi dari FINAL_TOP_M)*
 
-> Jawab: ...
+> Jawab: FINAL_TOP_M  menentukan berapa banyak chunk teratas yang benar-benar dikirim ke LLM sebagai konteks akhir untuk menjawab pertanyaan. Nilai ini langsung memengaruhi fokus jawaban, kelengkapan bukti, dan jumlah token yang dikirim ke model
 
 **Pengaruhnya:**
 
 | Range Nilai | Efek |
 | --- | --- |
-| **Sedikit (2–3)** | *(Jelaskan pengaruhnya terhadap fokus jawaban dan risiko konteks terlewat)* |
-| **Sedang (4–6)** ⭐ Recommended | *(Jelaskan mengapa range ini direkomendasikan)* |
-| **Banyak (7–10)** | *(Jelaskan pengaruhnya terhadap kelengkapan, kecepatan, dan potensi kebingungan LLM)* |
+| **Sedikit (2–3)** | *(Jawaban biasanya lebih fokus dan cepat, tetapi ada risiko konteks penting terlewat jika informasi tersebar di beberapa chunk)* |
+| **Sedang (4–6)** ⭐ Recommended | *(Range ini sering ideal karena konteks cukup lengkap tanpa terlalu membebani LLM dengan terlalu banyak potongan yang saling tumpang tindih)* |
+| **Banyak (7–10)** | *(Kelengkapan konteks bisa naik, tetapi latency ikut bertambah karena token lebih banyak, dan LLM juga bisa bingung jika terlalu banyak chunk yang mirip atau kurang relevan masuk bersama)* |
 
 > 💡 **Catatan:** Semakin banyak konteks = semakin banyak token yang dikirim ke LLM = latency lebih tinggi. Jaga agar tetap efisien.
 
