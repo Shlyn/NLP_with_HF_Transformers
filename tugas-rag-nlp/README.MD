@@ -61,15 +61,15 @@ Saat dokumen PDF diupload, teksnya dipotong-potong menjadi bagian kecil (chunk) 
 | --- | --- |
 | **Kecil (100–200)** | *(Chunk menjadi lebih fokus sehingga presisi pencarian bisa naik untuk pertanyaan spesifik, tetapi konteks mudah terpecah dan informasi penting bisa tersebar di beberapa chunk.)* |
 | **Sedang (250–400)** ⭐ Recommended | *(Range ini biasanya paling seimbang karena masih cukup ringkas untuk retrieval yang presisi, tetapi tetap menyimpan konteks yang cukup utuh untuk menjawab pertanyaan yang butuh penjelasan.)* |
-| **Besar (500–1000)** | *(Chunk besar membawa konteks lebih luas, tetapi pencarian bisa menjadi kurang tajam karena satu chunk memuat terlalu banyak topik dan noise, sehingga relevansi hasil retrieval dapat turun.)* |
+| **Besar (500–1000)** | *(konteks lebih luas, tetapi pencarian bisa menjadi kurang tajam karena satu chunk memuat terlalu banyak topik dan noise, sehingga relevansi hasil retrieval dapat turun.)* |
 
 **Pertanyaan Refleksi:**
 
 * Chunk besar atau kecil yang lebih tepat untuk dokumen yang kamu tes? Mengapa?
-  > Jawab: ...0.2, 0.84, 0.81
+  > Jawab: ...0.2, 0.84, 0.81. chunk sedang paling bagus, namun jika pilihannya antara yg besar dan kecil saya memilih besar. karena konteks lebih terjaga dan tidak ada informasi penting yg terlewat seperti pembagian pada chunk kecil.
 
 * Apa yang terjadi kalau jawaban terasa "terpotong" atau kurang konteks? Parameter mana yang harus diubah?
-  > Jawab: ...
+  > Jawab: biasanya anatara chunk terlalu kecil atau transisi pembagian chunk antarbagian dokumen tidak terjaga. coba naikin`CHUNK_SIZE`, kalau masih terasa terpotong dan kurang konteks coba naikin `CHUNK_OVERLAP` agar sebagian isi chunk sebelumnya ikut terbawa ke chunk berikutnya
 
 ---
 
