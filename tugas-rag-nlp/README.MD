@@ -229,19 +229,19 @@ Setiap model punya ukuran parameter dan kemampuan yang berbeda. Isi tabel di baw
 
 | Model | Ukuran | Pengaruh terhadap Kecepatan & Kualitas |
 | --- | --- | --- |
-| `llama-3.1-8b-instant` (Default) | 8B parameter | *(Jelaskan kecepatan, kualitas jawaban, dan kapan cocok dipakai)* |
-| `openai/gpt-oss-120b` | 120B parameter | *(Jelaskan kecepatan, kualitas jawaban, dan kapan cocok dipakai)* |
-| `llama-3.3-70b-versatile` | 70B parameter | *(Jelaskan kecepatan, kualitas jawaban, dan kapan cocok dipakai)* |
+| `llama-3.1-8b-instant` (Default) | 8B parameter | *(Sangat cepat dengan sekitar 560 tps, biaya murah, dan cocok untuk development, uji coba awal, atau QA dokumen yang relatif sederhana. Kualitasnya sudah baik untuk banyak tugas praktis, tetapi reasoning kompleks biasanya masih kalah dari model yang lebih besar)* |
+| `openai/gpt-oss-120b` | 120B parameter | *(Tetap sangat cepat di Groq dengan sekitar 500 tps, tetapi kualitas reasoning, coding, dan tugas kompleks lebih tinggi dibanding model kecil, sehingga cocok saat akurasi dan kemampuan analitis lebih diprioritaskan)* |
+| `llama-3.3-70b-versatile` | 70B parameter | *(Lebih lambat daripada 8B dengan kecepatan sekitar 280 tps, tetapi kualitasnya lebih kuat pada reasoning, coding, dan instruction following, bahkan dilaporkan mendekati kualitas Llama 3.1 405B. Model ini cocok untuk penggunaan produksi yang butuh keseimbangan antara kualitas tinggi dan konteks panjang)* |
 
 > 💡 **Tips:** Mulai dengan `llama-3.1-8b-instant` untuk development. Saat butuh akurasi tinggi, switch ke `llama-3.3-70b-versatile` atau `openai/gpt-oss-120b`.
 
 **Pertanyaan Refleksi:**
 
 * Apakah peningkatan kualitas jawaban dari model besar sebanding dengan penambahan waktu? Jelaskan.
-  > Jawab: ...
+  > Jawab: Tidak selalu sebanding. Untuk pertanyaan dokumen yang langsung dan retrieval yang sudah bagus, model kecil seperti 8B sering sudah cukup karena cepat dan hemat, sedangkan model besar lebih terasa manfaatnya pada pertanyaan yang kompleks, ambigu, atau membutuhkan reasoning lebih dalam
 
 * Model mana yang paling cocok untuk use-case dokumenmu? Mengapa?
-  > Jawab: ...
+  > Jawab: Untuk use-case QA dokumen, saya akan memilih  llama-3.3-70b-versatile  jika prioritasnya kualitas jawaban, karena model ini lebih kuat pada reasoning dan tetap mendukung context window panjang. Namun untuk proses development dan eksperimen cepat,  llama-3.1-8b-instant  lebih praktis karena latensinya sangat rendah dan biayanya lebih ringan
 
 ---
 
@@ -258,8 +258,8 @@ SCORE_THRESHOLD = 0.30 # skor minimum cosine similarity
 
 | Parameter | Nilai Default | Fungsi |
 | --- | --- | --- |
-| `CHUNK_OVERLAP` | 60 | *(Jelaskan fungsi overlap antar chunk dan apa dampaknya jika terlalu besar/kecil)* |
-| `SCORE_THRESHOLD` | 0.30 | *(Jelaskan fungsi threshold skor dan kapan harus dinaikkan/diturunkan)* |
+| `CHUNK_OVERLAP` | 60 | *(Overlap adalah bagian teks yang diulang antar chunk agar konteks di batas potongan tidak hilang. Jika terlalu kecil, informasi di ujung chunk bisa terasa putus; jika terlalu besar, duplikasi meningkat dan retrieval bisa menjadi lebih boros serta lebih noisy. Nilai overlap sekitar 10%–20% dari chunk size umum dipakai untuk menjaga kontinuitas)* |
+| `SCORE_THRESHOLD` | 0.30 | *(Threshold ini berfungsi sebagai batas minimum skor similarity agar sebuah chunk dianggap cukup relevan untuk dipakai. Jika terlalu tinggi, chunk yang sebenarnya berguna bisa terbuang; jika terlalu rendah, terlalu banyak chunk kurang relevan bisa ikut masuk. Naikkan nilai ini saat hasil retrieval terlalu noisy, dan turunkan saat sistem sering gagal menemukan bukti yang seharusnya masih relevan)* |
 
 ---
 
