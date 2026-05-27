@@ -59,9 +59,9 @@ Saat dokumen PDF diupload, teksnya dipotong-potong menjadi bagian kecil (chunk) 
 
 | Range Nilai | Efek |
 | --- | --- |
-| **Kecil (100–200)** | *(Jelaskan pengaruhnya terhadap presisi dan kelengkapan konteks)* |
-| **Sedang (250–400)** ⭐ Recommended | *(Jelaskan mengapa range ini direkomendasikan)* |
-| **Besar (500–1000)** | *(Jelaskan pengaruhnya terhadap pencarian dan relevansi)* |
+| **Kecil (100–200)** | *(Chunk menjadi lebih fokus sehingga presisi pencarian bisa naik untuk pertanyaan spesifik, tetapi konteks mudah terpecah dan informasi penting bisa tersebar di beberapa chunk.)* |
+| **Sedang (250–400)** ⭐ Recommended | *(Range ini biasanya paling seimbang karena masih cukup ringkas untuk retrieval yang presisi, tetapi tetap menyimpan konteks yang cukup utuh untuk menjawab pertanyaan yang butuh penjelasan.)* |
+| **Besar (500–1000)** | *(Chunk besar membawa konteks lebih luas, tetapi pencarian bisa menjadi kurang tajam karena satu chunk memuat terlalu banyak topik dan noise, sehingga relevansi hasil retrieval dapat turun.)* |
 
 **Pertanyaan Refleksi:**
 
