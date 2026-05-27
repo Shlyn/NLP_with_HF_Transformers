@@ -53,7 +53,7 @@ Saat dokumen PDF diupload, teksnya dipotong-potong menjadi bagian kecil (chunk) 
 
 **Fungsi:** *(Jelaskan dengan kata-katamu sendiri apa fungsi dari CHUNK_SIZE)*
 
-> Jawab: ...
+> Jawab: `CHUNK_SIZE` mengatur panjang setiap potongan teks saat dokumen dipecah menjadi chunk sebelum di-embedding dan dicari. Semakin tepat ukuran chunk, semakin seimbang antara fokus isi chunk dan kelengkapan konteks yang bisa diambil saat retrieval.
 
 **Pengaruhnya:**
 
