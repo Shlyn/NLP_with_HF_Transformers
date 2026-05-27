@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>RAG Playground</title>
+  <meta name="description" content="Upload PDFs and ask questions using Retrieval-Augmented Generation with Groq LLM."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #232633;
+      --border: #2d3143;
+      --text: #e4e6f0;
+      --text-dim: #8b8fa3;
+      --accent: #6c63ff;
+      --accent-glow: rgba(108, 99, 255, 0.25);
+      --green: #34d399;
+      --red: #f87171;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Layout */
+    .app { max-width: 900px; margin: 0 auto; padding: 24px 16px 40px; }
+
+    /* Header */
+    header { text-align: center; padding: 32px 0 24px; }
+    header h1 {
+      font-size: 1.75rem; font-weight: 700;
+      background: linear-gradient(135deg, #6c63ff, #a78bfa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    header p { color: var(--text-dim); font-size: 0.9rem; margin-top: 6px; }
+
+    /* Nav tabs */
+    .nav { display:flex; gap:6px; justify-content:center; margin-bottom:20px; }
+    .nav a { padding:10px 24px; border-radius:50px; font-size:.85rem; font-weight:600; text-decoration:none; color:var(--text-dim); background:var(--surface); border:1px solid var(--border); transition:.2s; }
+    .nav a:hover { color:var(--text); border-color:#3d4160; }
+    .nav a.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+    /* Status bar */
+    .status-bar {
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+      padding: 10px 20px; margin-bottom: 24px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 50px;
+      font-size: 0.8rem; color: var(--text-dim);
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .status-dot.off { background: var(--red); }
+    .model-badge {
+      margin-left: auto; padding: 4px 10px; border-radius: 6px;
+      background: var(--surface2); color: var(--accent);
+      font-weight: 600; font-size: 0.75rem; border: 1px solid var(--border);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+      transition: border-color 0.3s;
+    }
+    .card:hover { border-color: #3d4160; }
+    .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .card-title .icon { font-size: 1.1rem; }
+
+    /* Collapsible upload */
+    .toggle-btn {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      background: none; border: none; color: var(--text); cursor: pointer;
+      font: inherit; font-size: 1rem; font-weight: 600; padding: 0;
+    }
+    .toggle-btn .chevron { transition: transform 0.3s; font-size: 0.8rem; color: var(--text-dim); }
+    .toggle-btn .chevron.open { transform: rotate(180deg); }
+    .collapsible { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .collapsible.open { max-height: 600px; }
+
+    /* Inputs */
+    input[type="text"], textarea {
+      width: 100%; padding: 10px 14px;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+      color: var(--text); font: inherit; font-size: 0.9rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 60px; }
+
+    /* File input */
+    .file-area {
+      border: 2px dashed var(--border); border-radius: 10px; padding: 24px;
+      text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .file-area:hover { border-color: var(--accent); background: rgba(108, 99, 255, 0.05); }
+    .file-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .file-area .label { color: var(--text-dim); font-size: 0.85rem; }
+    .file-area .label strong { color: var(--accent); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border: none; border-radius: 10px;
+      font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 20px var(--accent-glow); }
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 28px var(--accent-glow); }
+    .btn-ghost { background: var(--surface2); color: var(--text-dim); }
+    .btn-ghost:hover:not(:disabled) { color: var(--text); background: var(--border); }
+
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 6px; font-weight: 500; }
+    .check-label { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--text-dim); cursor: pointer; }
+    .check-label input { accent-color: var(--accent); }
+
+    .toast {
+      font-size: 0.8rem; color: var(--text-dim); padding: 8px 0;
+      min-height: 24px;
+    }
+    .toast.ok { color: var(--green); }
+    .toast.err { color: var(--red); }
+
+    /* Chat area */
+    .chat-box {
+      display: flex; flex-direction: column; gap: 14px;
+      max-height: 500px; overflow-y: auto; padding: 4px 2px;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .msg {
+      max-width: 85%; padding: 14px 18px; border-radius: 16px;
+      font-size: 0.9rem; line-height: 1.65; animation: fadeUp 0.3s ease;
+    }
+    .msg.user {
+      align-self: flex-end; background: var(--accent); color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .msg.bot {
+      align-self: flex-start; background: var(--surface2); border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .msg.bot .mode-tag {
+      display: inline-block; font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 6px; margin-bottom: 8px;
+      background: rgba(108, 99, 255, 0.15); color: var(--accent);
+    }
+    .msg.bot .mode-tag.rag { background: rgba(52, 211, 153, 0.15); color: var(--green); }
+
+    /* Contexts accordion */
+    .ctx-toggle {
+      margin-top: 10px; font-size: 0.75rem; color: var(--accent);
+      cursor: pointer; background: none; border: none; font: inherit; font-weight: 600;
+    }
+    .ctx-toggle:hover { text-decoration: underline; }
+    .ctx-list { margin-top: 8px; display: none; }
+    .ctx-list.show { display: block; }
+    .ctx-item {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 12px; margin-bottom: 6px; font-size: 0.8rem;
+    }
+    .ctx-item .ctx-head { display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--text-dim); font-size: 0.7rem; }
+    .ctx-item .ctx-body { color: var(--text); }
+
+    /* Chat input bar */
+    .chat-input-bar {
+      display: flex; gap: 10px; align-items: flex-end;
+      margin-top: 16px;
+    }
+    .chat-input-bar textarea {
+      flex: 1; min-height: 44px; max-height: 120px;
+      padding: 12px 14px; border-radius: 12px;
+    }
+
+    .metrics { font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); }
+    .empty-state .emoji { font-size: 2.5rem; margin-bottom: 10px; }
+    .empty-state p { font-size: 0.85rem; }
+
+    /* Typing dots */
+    .typing { display: flex; gap: 5px; padding: 14px 18px; }
+    .typing span {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim);
+      animation: blink 1.4s infinite both;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    /* Prose overrides for markdown */
+    .msg.bot h1, .msg.bot h2, .msg.bot h3 { margin: 10px 0 6px; }
+    .msg.bot p { margin: 4px 0; }
+    .msg.bot ul, .msg.bot ol { padding-left: 18px; margin: 4px 0; }
+    .msg.bot code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+    .msg.bot pre { background: var(--bg); padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+    .msg.bot pre code { padding: 0; background: none; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes blink { 0%, 80%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
+
+    @media (max-width: 600px) {
+      .app { padding: 12px 10px 32px; }
+      header h1 { font-size: 1.35rem; }
+      .msg { max-width: 95%; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>RAG Playground</h1>
+    <p>Upload dokumen PDF, lalu ajukan pertanyaan.</p>
+  </header>
+
+  <nav class="nav">
+    <a href="/" class="active">💬 Playground</a>
+    <a href="/docs.html">📖 Dokumentasi</a>
+  </nav>
+
+  <div class="status-bar" id="statusBar">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">Connecting...</span>
+    <span id="modelBadge" class="model-badge" style="display:none"></span>
+  </div>
+
+  <!-- Upload Card (collapsible) -->
+  <section class="card">
+    <button class="toggle-btn" id="toggleUpload" type="button">
+      <span style="display:flex;align-items:center;gap:8px"><span class="icon">📄</span> Upload Knowledge</span>
+      <span class="chevron" id="chevron">▼</span>
+    </button>
+    <div class="collapsible" id="uploadPanel">
+      <div style="padding-top:16px">
+        <form id="ingestForm">
+          <div class="form-group">
+            <label>PDF Files</label>
+            <div class="file-area" id="fileArea">
+              <input name="file" id="pdfFiles" type="file" accept=".pdf" multiple/>
+              <div class="label" id="fileLabel">Drop PDF di sini atau <strong>klik untuk pilih</strong></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Teks Tambahan (opsional)</label>
+            <textarea name="text" id="rawText" rows="3" placeholder="Tulis teks bebas di sini..."></textarea>
+          </div>
+          <div class="row">
+            <input type="text" name="source" id="source" placeholder="Label sumber (opsional)" style="flex:1"/>
+            <label class="check-label">
+              <input type="checkbox" id="replaceCheckbox"/>
+              Replace
+            </label>
+            <button id="btnIngest" type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
+        <div class="toast" id="ingestResult"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chat Card -->
+  <section class="card" style="display:flex;flex-direction:column;">
+    <div class="card-title"><span class="icon">💬</span> Chat</div>
+    <div class="chat-box" id="chatBox">
+      <div class="empty-state" id="emptyState">
+        <div class="emoji">🤖</div>
+        <p>Mulai percakapan! Tanyakan apapun — <br/>atau upload PDF dulu untuk mode RAG.</p>
+      </div>
+    </div>
+    <div class="chat-input-bar">
+      <textarea id="query" rows="1" placeholder="Tulis pertanyaan..." oninput="autoResize(this)"></textarea>
+      <button id="btnAsk" class="btn btn-primary" type="button">Kirim</button>
+    </div>
+  </section>
+
+  <footer style="text-align:center;padding:16px 0;font-size:0.7rem;color:var(--text-dim);">
+    RAG Playground • Groq + SentenceTransformers • FastAPI
+  </footer>
+</div>
+
+<script>
+// --- Elements ---
+const chatBox = document.getElementById('chatBox');
+const emptyState = document.getElementById('emptyState');
+const queryInput = document.getElementById('query');
+const btnAsk = document.getElementById('btnAsk');
+const ingestForm = document.getElementById('ingestForm');
+const btnIngest = document.getElementById('btnIngest');
+const ingestRes = document.getElementById('ingestResult');
+const toggleUpload = document.getElementById('toggleUpload');
+const uploadPanel = document.getElementById('uploadPanel');
+const chevron = document.getElementById('chevron');
+const statusDot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+const pdfFiles = document.getElementById('pdfFiles');
+const fileLabel = document.getElementById('fileLabel');
+const replaceCheckbox = document.getElementById('replaceCheckbox');
+const modelBadge = document.getElementById('modelBadge');
+
+// --- Toggle upload panel ---
+toggleUpload.addEventListener('click', () => {
+  uploadPanel.classList.toggle('open');
+  chevron.classList.toggle('open');
+});
+
+// --- File input label ---
+pdfFiles.addEventListener('change', () => {
+  const n = pdfFiles.files.length;
+  fileLabel.innerHTML = n > 0
+    ? `<strong>${n} file${n > 1 ? 's' : ''} dipilih</strong>`
+    : 'Drop PDF di sini atau <strong>klik untuk pilih</strong>';
+});
+
+// --- Auto resize textarea ---
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// --- Health check ---
+async function checkHealth() {
+  try {
+    const r = await fetch('/health');
+    const j = await r.json();
+    statusDot.classList.remove('off');
+    const src = j.sources && j.sources.length ? j.sources.join(', ') : 'none';
+    statusText.textContent = `Online • ${j.docs} chunks • sources: ${src}`;
+    
+    if (j.model_name) {
+      modelBadge.textContent = j.model_name;
+      modelBadge.style.display = 'inline-block';
+    }
+  } catch {
+    statusDot.classList.add('off');
+    statusText.textContent = 'Offline';
+    modelBadge.style.display = 'none';
+  }
+}
+checkHealth();
+
+// --- Ingest ---
+ingestForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  btnIngest.disabled = true;
+  ingestRes.textContent = 'Uploading & indexing...';
+  ingestRes.className = 'toast';
+  const fd = new FormData(ingestForm);
+  if (replaceCheckbox.checked) fd.append('replace', 'true');
+  try {
+    const r = await fetch('/ingest', { method: 'POST', body: fd });
+    const j = await r.json();
+    if (r.ok) {
+      const rep = j.replaced ? ' (replaced)' : '';
+      ingestRes.textContent = `✓ ${j.ingested_chunks} chunks ingested (total: ${j.total_store})${rep} • ${j.latency_ms}ms`;
+      ingestRes.className = 'toast ok';
+      checkHealth();
+    } else {
+      ingestRes.textContent = '✗ ' + (j.detail || 'ingest failed');
+      ingestRes.className = 'toast err';
+    }
+  } catch (err) {
+    ingestRes.textContent = '✗ ' + err;
+    ingestRes.className = 'toast err';
+  } finally {
+    btnIngest.disabled = false;
+  }
+});
+
+// --- Chat ---
+function addMsg(role, html, meta) {
+  if (emptyState) emptyState.remove();
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = html;
+  if (meta) {
+    const m = document.createElement('div');
+    m.className = 'metrics';
+    m.textContent = meta;
+    div.appendChild(m);
+  }
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return div;
+}
+
+function addTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg bot typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+function removeTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+async function sendChat() {
+  const q = queryInput.value.trim();
+  if (!q) return;
+  btnAsk.disabled = true;
+  addMsg('user', q.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+  queryInput.value = '';
+  queryInput.style.height = 'auto';
+  addTyping();
+  try {
+    const r = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q })
+    });
+    removeTyping();
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.detail || 'chat failed');
+
+    const mode = j.mode || 'general';
+    const modeTag = mode === 'rag'
+      ? '<span class="mode-tag rag">RAG</span>'
+      : '<span class="mode-tag">General</span>';
+
+    let body = modeTag + marked.parse(j.answer || '');
+
+    // Contexts
+    if (j.contexts && j.contexts.length > 0) {
+      const ctxId = 'ctx-' + Date.now();
+      body += `<button class="ctx-toggle" onclick="document.getElementById('${ctxId}').classList.toggle('show')">▸ ${j.contexts.length} konteks ditemukan</button>`;
+      body += `<div class="ctx-list" id="${ctxId}">`;
+      j.contexts.forEach(c => {
+        const src = (c.meta && c.meta.source) || 'context';
+        body += `<div class="ctx-item"><div class="ctx-head"><span>${src}</span><span>score ${c.score}</span></div><div class="ctx-body">${c.text.replace(/</g,'&lt;')}</div></div>`;
+      });
+      body += '</div>';
+    }
+
+    const metricsStr = `retrieval ${j.metrics.retrieval_ms}ms • generation ${j.metrics.generation_ms}ms`;
+    addMsg('bot', body, metricsStr);
+  } catch (err) {
+    removeTyping();
+    addMsg('bot', `<span style="color:var(--red)">Error: ${err.message}</span>`);
+  } finally {
+    btnAsk.disabled = false;
+    queryInput.focus();
+  }
+}
+
+btnAsk.addEventListener('click', sendChat);
+queryInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+</script>
+</body>
+</html>
