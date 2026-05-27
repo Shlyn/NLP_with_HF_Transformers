@@ -153,24 +153,24 @@ Reranker adalah model tambahan (Cross-Encoder) yang mengevaluasi ulang pasangan 
 
 **Fungsi:** *(Jelaskan dengan kata-katamu sendiri apa fungsi dari USE_RERANKER)*
 
-> Jawab: ...
+> Jawab: USE_RERANKER  menentukan apakah sistem memakai model tambahan untuk menilai ulang pasangan pertanyaan dan chunk, lalu mengurutkan ulang kandidat berdasarkan relevansi yang lebih presisi. Dibanding similarity search biasa, reranker umumnya membuat konteks akhir lebih tepat karena penilaiannya melihat hubungan query dan chunk secara langsung
 
 **Pengaruhnya:**
 
 | Mode | Efek |
 | --- | --- |
-| `True` | *(Jelaskan pengaruhnya terhadap presisi, relevansi konteks, dan latency)* |
-| `False` | *(Jelaskan apa yang terjadi jika hanya mengandalkan cosine similarity)* |
+| `True` | *(Presisi retrieval biasanya naik karena kandidat terbaik dipilih ulang dengan lebih akurat, sehingga konteks yang masuk ke LLM lebih relevan, tetapi latency bertambah karena ada satu tahap evaluasi tambahan)* |
+| `False` | *(Sistem hanya mengandalkan similarity awal, sehingga lebih cepat, tetapi lebih mudah salah urut saat ada chunk yang mirip secara semantik namun tidak benar-benar menjawab pertanyaan)* |
 
 > 💡 **Catatan:** Untuk dokumen teknis atau pertanyaan yang ambigu, reranker sangat membantu. Untuk kecepatan maksimal, matikan.
 
 **Pertanyaan Refleksi:**
 
 * Pada query jenis apa reranker paling terasa manfaatnya? Berikan contoh.
-  > Jawab: ...
+  > Jawab: Reranker paling terasa pada query yang ambigu, teknis, atau membutuhkan pembedaan konteks yang halus. Contohnya, pertanyaan seperti “apa perbedaan fine-tuning dan instruction tuning menurut dokumen ini?” lebih terbantu oleh reranker karena beberapa chunk bisa sama-sama mirip, tetapi tidak semuanya benar-benar menjawab inti pertanyaan
 
 * Berapa kira-kira tambahan latency saat reranker dinyalakan di eksperimenmu?
-  > Jawab: ...
+  > Jawab: Isi bagian ini dengan angka dari hasil run kamu sendiri. Secara konsep, latency memang bertambah karena setiap kandidat chunk perlu dinilai ulang sebelum dipilih menjadi konteks final
 
 ---
 
