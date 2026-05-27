@@ -137,7 +137,7 @@ Dari sekian banyak kandidat yang ditemukan, hanya **M teratas** (setelah reranki
   > Jawab: ... 4,7,6
 
 * Apa yang terjadi kalau konteks yang dikirim ke LLM saling bertentangan?
-  > Jawab: ...
+  > Jawab: Jika chunk yang dikirim saling bertentangan, LLM bisa menghasilkan jawaban yang ragu-ragu, mencampur dua informasi, atau memilih salah satu tanpa dasar yang jelas. Karena itu, pemilihan konteks akhir harus tetap ketat agar hanya chunk yang paling relevan dan konsisten yang masuk ke prompt.
 
 ---
 
