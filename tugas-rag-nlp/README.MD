@@ -85,25 +85,25 @@ Setelah pertanyaan diubah jadi vektor, sistem mencari chunk yang paling mirip. `
 
 **Fungsi:** *(Jelaskan dengan kata-katamu sendiri apa fungsi dari TOP_K_INITIAL)*
 
-> Jawab: ...
+> Jawab: TOP_K_INITIAL  menentukan berapa banyak kandidat chunk awal yang diambil dari hasil similarity search sebelum dipilih lagi untuk tahap berikutnya. Parameter ini penting untuk mengatur keseimbangan antara recall yang luas dan waktu proses retrieval
 
 **Pengaruhnya:**
 
 | Range Nilai | Efek |
 | --- | --- |
-| **Kecil (5–10)** | *(Jelaskan pengaruhnya terhadap kecepatan dan recall)* |
-| **Sedang (15–25)** ⭐ Recommended | *(Jelaskan mengapa range ini direkomendasikan)* |
-| **Besar (30–50)** | *(Jelaskan pengaruhnya terhadap recall dan waktu proses)* |
+| **Kecil (5–10)** | *(Lebih cepat karena kandidat yang dicek sedikit, tetapi recall bisa turun karena beberapa chunk relevan mungkin tidak ikut masuk ke daftar awal. )* |
+| **Sedang (15–25)** ⭐ Recommended | *(Range ini cukup luas untuk menangkap kandidat relevan tambahan, tetapi belum terlalu berat untuk proses reranking dan generasi. )* |
+| **Besar (30–50)** | *(Recall biasanya meningkat karena lebih banyak kandidat diperiksa, tetapi waktu proses juga naik dan risiko noise ikut bertambah sebelum reranking dilakukan.)* |
 
 > 💡 **Catatan:** Nilai ini hanya berpengaruh signifikan jika `USE_RERANKER = True`. Tanpa reranker, yang dipakai langsung hanya `FINAL_TOP_M` teratas.
 
 **Pertanyaan Refleksi:**
 
 * Apakah top-k kecil (5–10) cukup untuk dataset kamu? Jelaskan alasannya.
-  > Jawab: ...
+  > Jawab: Top-k kecil bisa cukup jika dokumennya pendek, topiknya sempit, dan pertanyaannya sangat langsung. Namun jika jawaban tersebar di beberapa bagian dokumen atau istilah pertanyaannya tidak persis sama dengan isi PDF, top-k kecil lebih berisiko melewatkan chunk yang sebenarnya penting.
 
 * Apa hubungan antara `TOP_K_INITIAL` dan `USE_RERANKER`?
-  > Jawab: ...
+  > Jawab: TOP_K_INITIAL  paling terasa manfaatnya saat  USE_RERANKER = True  karena reranker butuh kumpulan kandidat awal yang cukup banyak untuk dipilah ulang menjadi konteks terbaik. Jika reranker dimatikan, penambahan kandidat awal biasanya tidak terlalu membantu karena sistem tidak punya tahap penilaian ulang yang lebih akurat.
 
 ---
 
