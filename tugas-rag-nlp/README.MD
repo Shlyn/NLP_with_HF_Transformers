@@ -186,26 +186,26 @@ Temperature mengatur distribusi probabilitas saat LLM memilih kata berikutnya. S
 
 **Fungsi:** *(Jelaskan dengan kata-katamu sendiri apa fungsi dari TEMPERATURE)*
 
-> Jawab: ...
+> Jawab: TEMPERATURE  mengatur tingkat variasi saat model memilih token berikutnya saat menghasilkan jawaban. Nilai rendah membuat jawaban lebih konsisten dan dekat ke konteks, sedangkan nilai tinggi membuat jawaban lebih bebas dan kreatif
 
 **Pengaruhnya:**
 
 | Range Nilai | Efek |
 | --- | --- |
-| **0.0–0.2** ⭐ Recommended untuk RAG | *(Jelaskan sifat jawaban di range ini: konsistensi, faktualitas)* |
-| **0.3–0.5** | *(Jelaskan sifat jawaban di range ini)* |
-| **0.6–0.8** | *(Jelaskan sifat jawaban di range ini: kreativitas, variasi)* |
-| **0.9–1.0** | *(Jelaskan risiko jawaban di range ini: halusinasi, keacakan)* |
+| **0.0–0.2** ⭐ Recommended untuk RAG | *(Jawaban cenderung stabil, konsisten, dan lebih faktual, sehingga lebih cocok untuk QA berbasis dokumen karena model tetap grounded pada konteks yang diberikan)* |
+| **0.3–0.5** | *(Jawaban masih relatif terkontrol, tetapi mulai lebih fleksibel dalam gaya bahasa dan perumusan kalimat)* |
+| **0.6–0.8** | *(Kreativitas dan variasi meningkat, tetapi risiko model menjauh dari konteks dokumen juga mulai naik)* |
+| **0.9–1.0** | *(Jawaban menjadi lebih acak dan berisiko lebih tinggi mengalami halusinasi atau menyisipkan detail yang tidak didukung dokumen)* |
 
 > ⚠️ **Catatan:** Untuk RAG (jawaban berdasarkan dokumen), gunakan temperature rendah (0.1–0.3) agar jawaban tetap *grounded* pada konteks yang diberikan.
 
 **Pertanyaan Refleksi:**
 
 * Untuk QA berbasis dokumen perusahaan, temperatur ideal berapa? Jelaskan alasannya.
-  > Jawab: ...
+  > Jawab: Temperatur ideal ada di kisaran 0.1–0.3, dan 0.2 adalah pilihan yang aman. Pada rentang ini, jawaban cenderung konsisten, faktual, dan tidak mudah melenceng dari konteks dokumen perusahaan
 
 * Apa yang terjadi pada jawaban saat kamu naikkan temperature ke 0.9?
-  > Jawab: ...
+  > Jawab: Saat temperature dinaikkan ke 0.9, jawaban biasanya menjadi lebih bervariasi, tetapi juga lebih sulit diprediksi dan lebih rawan menambahkan informasi yang tidak benar-benar didukung dokumen. Dalam sistem RAG, kondisi ini meningkatkan risiko halusinasi dan menurunkan sifat grounded dari jawaban
 
 ---
 
